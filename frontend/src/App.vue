@@ -118,6 +118,9 @@
               <el-button class="btn-copy" size="small" :disabled="!state.result" @click="copyResult">
                 {{ state.isEnglish ? i18n.copy.en : i18n.copy.zh }}
               </el-button>
+              <el-button class="btn-download" size="small" :disabled="!state.result" @click="downloadResult">
+                {{ state.isEnglish ? i18n.download.en : i18n.download.zh }}
+              </el-button>
             </div>
           </div>
 
@@ -157,6 +160,7 @@ const state = reactive({
   isEnglish: false,
   songsCount: 0,
   totalCount: 0,
+  playlistName: '',
   useDetailedSongName: false,
   songFormat: 'song-singer',
   songOrder: 'normal',
@@ -173,6 +177,7 @@ const i18n = {
   fetchSongList: {en: 'Fetch Song List', zh: '获取歌单'},
   resultHint: {en: 'Result will be displayed here', zh: '结果会显示在这里'},
   copy: {en: 'Copy result', zh: '复制结果'},
+  download: {en: 'Download TXT', zh: '下载 TXT'},
   parsed: {en: 'Parsed', zh: '已解析'},
   total: {en: 'Total', zh: '总数'},
   detailedSongName: {
@@ -201,6 +206,7 @@ function reset(msg) {
   state.result = "";
   state.songsCount = 0;
   state.totalCount = 0;
+  state.playlistName = "";
 }
 
 const fetchLinkDetails = async () => {
@@ -225,6 +231,7 @@ const fetchLinkDetails = async () => {
     state.result = resp.data.songs.join('\n');
     state.songsCount = resp.data.songs_count;
     state.totalCount = resp.data.total_count;
+    state.playlistName = resp.data.name || '';
   } catch (err) {
     console.error(err);
     reset(err.response?.data?.detail || (state.isEnglish ? "Request failed, please try again later~" : "请求失败，请稍后再试~"));
@@ -245,6 +252,24 @@ const copyResult = () => {
   document.execCommand('copy');
   document.body.removeChild(textarea);
   ElMessage.success({message: state.isEnglish ? 'Copied to clipboard' : '已复制到剪贴板', type: 'success'});
+};
+
+const downloadResult = () => {
+  if (!state.result) {
+    ElMessage.error({message: state.isEnglish ? 'No content to download' : '没有内容可下载', type: 'error'});
+    return;
+  }
+  // ponytail: 清理 Windows 文件名非法字符，歌单名来自 API 非用户输入但仍可能含特殊符号
+  const safeName = (state.playlistName || 'playlist').replace(/[\\/:*?"<>|]/g, '_').trim() || 'playlist';
+  const blob = new Blob([state.result], {type: 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = safeName + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
 
 const throttle = (fn, delay) => {
@@ -391,7 +416,7 @@ html, body { background: var(--canvas); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 /* ── 面板卡片 ── */
@@ -497,12 +522,12 @@ html, body { background: var(--canvas); }
   background: var(--accent-hover);
   border-color: var(--accent-hover);
 }
-.app .btn-copy {
+.app .btn-copy, .app .btn-download {
   background: var(--surface);
   color: var(--text);
   border-color: var(--border-strong);
 }
-.app .btn-copy:hover {
+.app .btn-copy:hover, .app .btn-download:hover {
   color: var(--accent);
   border-color: var(--accent);
   background: var(--accent-soft);
