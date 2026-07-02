@@ -295,9 +295,9 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
   --text: #0f172a;            /* slate-900 */
   --text-secondary: #64748b;  /* slate-500 */
   --text-tertiary: #94a3b8;   /* slate-400, placeholder / footer-hint */
-  --accent: #4f46e5;          /* indigo-600 */
-  --accent-hover: #4338ca;
-  --accent-soft: #eef2ff;     /* indigo-50 */
+  --accent: #409eff;          /* Element Plus primary blue */
+  --accent-hover: #337ecc;
+  --accent-soft: #ecf5ff;     /* el-color-primary-light-9 */
   --radius: 10px;
   --radius-sm: 8px;
 }
@@ -524,9 +524,9 @@ html, body { background: var(--canvas); }
   border-bottom-right-radius: var(--radius-sm);
 }
 .app .el-radio-button__original-radio:checked + .el-radio-button__inner {
-  background: var(--accent-soft);
+  background: var(--accent) !important;
   border-color: var(--accent) !important;
-  color: var(--accent);
+  color: #fff !important;
   box-shadow: none !important;
 }
 .app .el-radio-button__inner:hover { color: var(--accent); }
