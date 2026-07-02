@@ -8,3 +8,22 @@ services:
       - PORT=${PORT:-8081}
       - RATE_LIMIT=${RATE_LIMIT:-10/minute}
     restart: unless-stopped
+    init: true
+    # 安全加固：丢弃所有 Linux capabilities + 禁止提权
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    # 健康检查：用镜像内 python 探 /api/health（slim 镜像无 curl）
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/api/health' % os.environ.get('PORT','8081')).close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # 日志轮转：默认 json-file 无限增长会撑爆磁盘
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
