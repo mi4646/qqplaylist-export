@@ -12,3 +12,7 @@ __pycache__/
 *.log
 .env
 .env.local
+
+# 本地测试导出的歌单数据，不入库
+新建歌单1.txt
+*.txt
