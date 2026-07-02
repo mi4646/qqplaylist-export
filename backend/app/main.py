@@ -8,7 +8,7 @@ from .log import logger
 from .qqmusic.service import QQMusicError, parse_playlist
 from .schemas import PlaylistRequest, PlaylistResponse
 
-app = FastAPI(title="QQMusic Playlist API", version="1.0.0")
+app = FastAPI(title="qqplaylist-export API", version="1.0.0")
 
 # 前端构建产物目录（由 Dockerfile 或 yarn build 生成）
 DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"

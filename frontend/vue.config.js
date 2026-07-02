@@ -4,7 +4,7 @@ module.exports = defineConfig({
   pages: {
     index: {
       entry: 'src/main.js',
-      title: 'QQ音乐歌单迁移'
+      title: 'qqplaylist-export'
     }
   },
   devServer: {

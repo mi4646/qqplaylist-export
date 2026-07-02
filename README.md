@@ -1,4 +1,4 @@
-# QQMusic Playlist
+# qqplaylist-export
 
 将 QQ 音乐歌单链接解析为纯文本歌单（"歌名 - 歌手" 列表），供粘贴到 TuneMyMusic / Spotlistr 等工具迁移至 Apple / YouTube / Spotify。
 
