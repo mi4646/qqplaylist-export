@@ -14,7 +14,8 @@ RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r re
 COPY backend/app ./app
 COPY --from=frontend /app/frontend/dist ./frontend/dist
 ENV HOST=0.0.0.0 \
-    PORT=8081
+    PORT=8081 \
+    FRONTEND_DIST=/app/frontend/dist
 EXPOSE ${PORT}
 # ponytail: exec form 不展开环境变量，用 sh -c 让 ${VAR} 生效；exec 让 uvicorn 接管 PID 1 接收 SIGTERM
 CMD ["sh", "-c", "exec uvicorn app.main:app --host ${HOST} --port ${PORT}"]

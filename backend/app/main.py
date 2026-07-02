@@ -1,4 +1,5 @@
 """FastAPI 入口：QQ 音乐歌单解析 Web 服务。"""
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
@@ -32,7 +33,10 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # 前端构建产物目录（由 Dockerfile 或 yarn build 生成）
-DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+# ponytail: 本地 __file__ 上溯三级 = 仓库根；docker 里 backend/app 被拷到 /app/app 少一层，
+# 路径算到 /frontend/dist 而非 /app/frontend/dist，故用 FRONTEND_DIST 覆盖。
+DIST = Path(os.environ.get("FRONTEND_DIST",
+                           Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"))
 
 
 def _format_songs(songs: list[str], fmt: str) -> list[str]:
