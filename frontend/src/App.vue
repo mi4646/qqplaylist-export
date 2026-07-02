@@ -327,8 +327,8 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
   --radius-sm: 8px;
 }
 
-/* ponytail: html/body 同底色，避免过度滚动时露出白底与 .app 不一致 */
-html, body { background: var(--canvas); }
+/* ponytail: html/body 同底色，避免过度滚动时露出白底与 .app 不一致；margin 归零防止 .app min-height:100vh 叠加默认 margin 溢出 */
+html, body { background: var(--canvas); margin: 0; }
 
 .app {
   min-height: 100vh;
@@ -598,5 +598,14 @@ html, body { background: var(--canvas); }
   .hero { flex-direction: column; align-items: flex-start; gap: 16px; }
   .hero-title { font-size: 30px; }
   .grid { grid-template-columns: 1fr; }
+}
+
+/* ponytail: 小高度视口压缩垂直留白，让页面尽量一屏装下；大屏保持舒展 */
+@media (max-height: 800px) {
+  .shell { padding: 32px 24px 12px; }
+  .hero { padding-bottom: 16px; margin-bottom: 16px; }
+  .hero-sub { margin-top: 6px; }
+  .footer { margin-top: 16px; padding-top: 12px; }
+  .footer-hint { margin-top: 2px !important; }
 }
 </style>
