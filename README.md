@@ -1,10 +1,62 @@
 # qqplaylist-export
 
-将 QQ 音乐歌单链接解析为纯文本歌单（"歌名 - 歌手" 列表），供粘贴到 TuneMyMusic / Spotlistr 等工具迁移至 Apple / YouTube / Spotify。
+把 QQ 音乐歌单一键导出成纯文本歌单（「歌名 - 歌手」列表），方便粘贴到 TuneMyMusic / Spotlistr 等工具，迁移到 Apple Music / YouTube Music / Spotify。
 
-后端：Python + FastAPI + httpx(async)。前端：Vue3 + Element Plus（位于 `frontend/`）。
+提供网页界面，也提供 HTTP API。后端 Python + FastAPI，前端 Vue3 + Element Plus。
 
-## 接口
+## 功能
+
+- 粘贴 QQ 音乐歌单链接，一键解析出全部歌曲文本
+- 支持大歌单（自动分页，上限 10000 首）
+- 可选格式：`歌名 - 歌手` / `歌手 - 歌名` / 仅歌名
+- 可选保留原始歌名（不去括号、不去标记）
+- 实时调用，不缓存、不落库
+
+## 快速开始
+
+### 用 Docker（最简单）
+
+```bash
+docker build -t qqplaylist-export .
+docker run -p 8081:8081 qqplaylist-export
+```
+
+打开 http://localhost:8081 ，把歌单链接粘进页面即可。
+
+### 本地开发
+
+后端：
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8081
+```
+
+前端开发服务器（`/api` 自动代理到 8081）：
+
+```bash
+cd frontend
+npm install
+npm run serve     # http://localhost:8080
+```
+
+前端构建后，单独跑后端即可同时提供 API 与页面：
+
+```bash
+cd frontend && npm run build     # 产物到 frontend/dist
+uvicorn app.main:app --port 8081  # http://localhost:8081
+```
+
+环境变量：`HOST`（默认 `0.0.0.0`）、`PORT`（默认 `8081`）、`RATE_LIMIT`（默认 `10/minute`，作用于 `POST /api/playlist`）。Docker 部署时端口与限流可由根目录 `.env` 注入（参考 `.env.example`），`PORT=9000 docker compose up` 即可改端口。
+
+## 背景
+
+本项目参考 [Bistutu/GoMusic](https://github.com/Bistutu/GoMusic) 的 Python 版本，并修复了其**歌单数量识别不准**的问题：原版在大歌单分页时，遇到单页失败会整页丢弃，导致总数十首几十首地少（例如总数 950 首只解析出 930 首）。
+
+本仓库改为整页失败时逐步拆小重试，仅在单首确实取不到（下架/区域限制）时才放弃该首，并把原始总数与实际解析数一并返回，缺失一目了然。详见 `backend/app/qqmusic/client.py` 的 `fetch_page_resilient`。
+
+## HTTP API
 
 `POST /api/playlist`
 
@@ -29,50 +81,19 @@
 {
   "name": "歌单标题",
   "songs": ["歌名 - 歌手", "..."],
-  "songs_count": 179
+  "songs_count": 179,
+  "total_count": 179
 }
 ```
 
+- `songs_count`：实际解析出的歌曲数
+- `total_count`：QQ 音乐返回的歌单原始总数；正常等于 `songs_count`，若个别歌曲下架/被限制则会偏大，差值即缺失数
+
 错误：HTTP 4xx，`{"detail": "中文错误信息"}`。
 
-## 本地开发
-
-后端：
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8081
-```
-
-前端（开发服务器，`/api` 自动代理到 8081）：
-
-```bash
-cd frontend
-npm install
-npm run serve     # http://localhost:8080
-```
-
-前端构建（产物供后端托管）：
-
-```bash
-cd frontend
-npm run build     # 产物到 frontend/dist
-```
-
-构建后单独跑后端即可同时提供 API 与页面：`uvicorn app.main:app --port 8081` → http://localhost:8081
-
-## Docker
-
-```bash
-docker build -t qqplaylist-export .
-docker run -p 8081:8081 qqplaylist-export
-```
-
-镜像内多阶段构建：node 编译前端 → python 运行后端并托管 `frontend/dist`。
+健康检查：`GET /api/health`（不限流）。
 
 ## 说明
 
-- 不缓存、不落库，每次请求实时调用 QQ 音乐 API。
-- 签名算法移植自原 Go 版 `Encrypt`（md5 + 自定义 base64），见 `backend/app/qqmusic/sign.py`，含自检向量。
-- 大歌单按 30 首/页分页，上限 10000 首。
+- 签名算法移植自原 Go 版 `Encrypt`（md5 + 自定义 base64），见 `backend/app/qqmusic/sign.py`，含自检向量，可用 `python backend/app/qqmusic/sign.py` 验证。
+- 限流按客户端 IP 限制；直连部署（如云服务器直接暴露端口）即开即用。若自行在前面再加一层 nginx 反代，需配置 `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` 透传客户端 IP，否则限流会按代理 IP 误伤全局。

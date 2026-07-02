@@ -2,8 +2,9 @@ services:
   app:
     build: .
     ports:
-      - "8081:8081"
+      - "${PORT:-8081}:${PORT:-8081}"
     environment:
       - HOST=0.0.0.0
-      - PORT=8081
+      - PORT=${PORT:-8081}
+      - RATE_LIMIT=${RATE_LIMIT:-10/minute}
     restart: unless-stopped

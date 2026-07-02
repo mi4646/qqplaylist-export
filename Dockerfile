@@ -13,6 +13,8 @@ COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY --from=frontend /app/frontend/dist ./frontend/dist
-ENV PORT=8081
-EXPOSE 8081
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8081"]
+ENV HOST=0.0.0.0 \
+    PORT=8081
+EXPOSE ${PORT}
+# ponytail: exec form 不展开环境变量，用 sh -c 让 ${VAR} 生效；exec 让 uvicorn 接管 PID 1 接收 SIGTERM
+CMD ["sh", "-c", "exec uvicorn app.main:app --host ${HOST} --port ${PORT}"]
