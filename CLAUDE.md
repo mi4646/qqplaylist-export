@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-qqplaylist-export — 将 QQ 音乐歌单链接解析为纯文本歌单（"歌名 - 歌手" 列表），供迁移到 Apple/YouTube/Spotify。后端 Python + FastAPI + httpx(async)，前端 Vue3 + Element Plus（位于 `frontend/`）。无缓存、无数据库，每次请求实时调用 QQ 音乐 API。详见 `README.md` 与 `DESIGN.md`。
+qqplaylist-export — 将 QQ 音乐歌单链接解析为纯文本歌单（"歌名 - 歌手" 列表），供迁移到 Apple/YouTube/Spotify。后端 Python + FastAPI + httpx(async)，前端 Vue3 + Element Plus（位于 `frontend/`）。无缓存、无数据库，每次请求实时调用 QQ 音乐 API。详见 `README.md`。
 
 ## 常用命令
 

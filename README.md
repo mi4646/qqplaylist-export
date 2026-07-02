@@ -9,7 +9,9 @@
 - 粘贴 QQ 音乐歌单链接，一键解析出全部歌曲文本
 - 支持大歌单（自动分页，上限 10000 首）
 - 可选格式：`歌名 - 歌手` / `歌手 - 歌名` / 仅歌名
+- 可选顺序：正序 / 倒序
 - 可选保留原始歌名（不去括号、不去标记）
+- 一键复制结果，或下载为 TXT（文件名取歌单名）
 - 实时调用，不缓存、不落库
 
 ## 快速开始
@@ -19,6 +21,12 @@
 ```bash
 docker build -t qqplaylist-export .
 docker run -p 8081:8081 qqplaylist-export
+```
+
+或用 docker compose（已配置健康检查、日志轮转、安全加固）：
+
+```bash
+docker compose up -d --build
 ```
 
 打开 http://localhost:8081 ，把歌单链接粘进页面即可。
@@ -48,7 +56,15 @@ cd frontend && npm run build     # 产物到 frontend/dist
 uvicorn app.main:app --port 8081  # http://localhost:8081
 ```
 
-环境变量：`HOST`（默认 `0.0.0.0`）、`PORT`（默认 `8081`）、`RATE_LIMIT`（默认 `10/minute`，作用于 `POST /api/playlist`）。Docker 部署时端口与限流可由根目录 `.env` 注入（参考 `.env.example`），`PORT=9000 docker compose up` 即可改端口。
+环境变量：
+
+| 变量 | 默认 | 说明 |
+|------|------|------|
+| `HOST` | `0.0.0.0` | 后端监听地址，容器内通常保持默认 |
+| `PORT` | `8081` | 后端监听端口；docker compose 同时以此端口对外暴露。注意 `cap_drop: ALL` 下不能 `<1024`，需 80/443 请用反代 |
+| `RATE_LIMIT` | `10/minute` | slowapi 限流规则，作用于 `POST /api/playlist`；`/api/health` 不限流 |
+
+docker compose 会自动读取同目录 `.env`，也可直接前缀：`PORT=9000 docker compose up`。
 
 ## 背景
 
