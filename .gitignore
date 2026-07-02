@@ -16,3 +16,6 @@ __pycache__/
 # 本地测试导出的歌单数据，不入库
 新建歌单1.txt
 *.txt
+
+# Claude Code 本地配置（项目级）
+.claude/

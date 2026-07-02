@@ -4,3 +4,4 @@
 **/*.pyc
 .git
 *.md
+.claude
