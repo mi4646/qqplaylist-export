@@ -286,21 +286,26 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
 
 <style>
 /* ── 设计 token ── */
-.app {
-  --bg: #ffffff;
+/* ── 设计 token：放 :root，使 ElMessage 等 teleport 到 body 的弹层也能继承 ── */
+:root {
   --canvas: #f8fafc;          /* slate-50 页面底 */
   --surface: #ffffff;
   --border: #e2e8f0;          /* slate-200 */
   --border-strong: #cbd5e1;   /* slate-300 */
   --text: #0f172a;            /* slate-900 */
   --text-secondary: #64748b;  /* slate-500 */
+  --text-tertiary: #94a3b8;   /* slate-400, placeholder / footer-hint */
   --accent: #4f46e5;          /* indigo-600 */
   --accent-hover: #4338ca;
   --accent-soft: #eef2ff;     /* indigo-50 */
   --radius: 10px;
   --radius-sm: 8px;
+}
 
-  background: var(--canvas);
+/* ponytail: html/body 同底色，避免过度滚动时露出白底与 .app 不一致 */
+html, body { background: var(--canvas); }
+
+.app {
   min-height: 100vh;
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
@@ -460,7 +465,7 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
 }
 .app .el-input__wrapper.is-focus { border-color: var(--accent) !important; }
 .app .el-input__inner { color: var(--text); font-size: 14px; }
-.app .el-input__inner::placeholder { color: #94a3b8; }
+.app .el-input__inner::placeholder { color: var(--text-tertiary); }
 
 .app .el-textarea__inner {
   border: 1px solid var(--border-strong) !important;
@@ -477,7 +482,7 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
   border-color: var(--accent) !important;
   box-shadow: none !important;
 }
-.app .el-textarea__inner::placeholder { color: #94a3b8; font-family: inherit; }
+.app .el-textarea__inner::placeholder { color: var(--text-tertiary); font-family: inherit; }
 
 .app .el-button {
   border-radius: var(--radius-sm);
@@ -560,7 +565,7 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
 .footer p { margin: 0; }
 .footer a { color: var(--accent); text-decoration: none; }
 .footer a:hover { text-decoration: underline; }
-.footer-hint { margin-top: 4px !important; color: #94a3b8; }
+.footer-hint { margin-top: 4px !important; color: var(--text-tertiary); }
 
 /* ── 响应式：移动端单栏 ── */
 @media (max-width: 880px) {
