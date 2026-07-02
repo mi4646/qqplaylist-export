@@ -1,0 +1,14 @@
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node / 前端
+**/node_modules/
+**/dist/
+
+# 日志与本地环境
+*.log
+.env
+.env.local
