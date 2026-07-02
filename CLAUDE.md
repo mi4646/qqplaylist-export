@@ -41,7 +41,9 @@ docker build -t qqplaylist-export .
 docker run -p 8081:8081 qqplaylist-export
 ```
 
-环境变量：`HOST`（默认 `0.0.0.0`）、`PORT`（默认 `8081`），见 `backend/app/config.py`。
+环境变量：`HOST`（默认 `0.0.0.0`）、`PORT`（默认 `8081`）、`RATE_LIMIT`（默认 `10/minute`，slowapi 限流规则，作用于 `POST /api/playlist`，见 `backend/app/config.py`）。
+
+限流：`backend/app/main.py` 用 slowapi 对 `/api/playlist` 限流，key 取 `X-Forwarded-For` 首段（云部署反代场景必需，nginx 需 `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`），`/api/health` 不限流。
 
 ## 架构
 
